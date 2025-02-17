@@ -116,11 +116,14 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
 
 # Process JSON Lambda Function
 resource "aws_lambda_function" "process_json" {
-  filename         = "lambda_function.zip"
+  filename         = "process_json_lambda.zip"
   function_name    = "process_json_lambda"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "process_json_lambda.lambda_handler"
   runtime         = "python3.13"
+
+   # This will force an update when the zip contents change
+  source_code_hash = filebase64sha256("process_json_lambda.zip")
 
   depends_on = [
     aws_iam_role_policy.lambda_logs,
@@ -131,11 +134,14 @@ resource "aws_lambda_function" "process_json" {
 
 # Reminder Lambda Function
 resource "aws_lambda_function" "reminder" {
-  filename         = "lambda_function.zip"
+  filename         = "reminder_lambda.zip"
   function_name    = "reminder_lambda"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "reminder_lambda.lambda_handler"
   runtime         = "python3.13"
+
+   # This will force an update when the zip contents change
+  source_code_hash = filebase64sha256("reminder_lambda.zip")
 
   depends_on = [
     aws_iam_role_policy.lambda_logs,

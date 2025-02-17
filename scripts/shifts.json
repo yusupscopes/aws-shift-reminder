@@ -2,5 +2,6 @@
   "shifts": [
     { "date": "2025-02-17", "shift": "Afternoon" },
     { "date": "2025-02-18", "shift": "Night" }
+    { "date": "2025-02-19", "shift": "Afternoon" }
   ]
 }
