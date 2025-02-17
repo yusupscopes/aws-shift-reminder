@@ -9,11 +9,11 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb")
-ses_client = boto3.client("ses", region_name="us-east-1")  # Adjust AWS region
+ses_client = boto3.client("ses", region_name="ap-southeast-1")  # Adjust AWS region
 table = dynamodb.Table("ShiftSchedules")
 
-SENDER_EMAIL = "your-email@example.com"
-RECIPIENT_EMAIL = "recipient@example.com"
+SENDER_EMAIL = "dalkkumiapps@gmail.com"
+RECIPIENT_EMAIL = "yusupmaulana950@gmail.com"
 
 def lambda_handler(event, context):
     """Check tomorrow's shift and send a reminder"""
