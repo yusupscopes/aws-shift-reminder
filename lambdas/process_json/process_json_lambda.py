@@ -28,7 +28,9 @@ def lambda_handler(event, context):
 
         # Read JSON data
         with open(local_path, "r") as file:
-            data = json.load(file)
+            raw_data = file.read()  # Read the raw data
+            logger.info(f"Raw JSON data: {raw_data}")  # Log the raw data
+            data = json.loads(raw_data)  # Use json.loads to parse the raw data
 
         # Store shifts in DynamoDB
         with table.batch_writer() as batch:
