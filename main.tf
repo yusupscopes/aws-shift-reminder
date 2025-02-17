@@ -106,7 +106,8 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
           "dynamodb:Scan",
-          "dynamodb:Query"
+          "dynamodb:Query",
+          "dynamodb:BatchWriteItem"
         ]
         Resource = aws_dynamodb_table.shift_schedules.arn
       }
