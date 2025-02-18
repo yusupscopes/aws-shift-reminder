@@ -1,7 +1,14 @@
 {
   "shifts": [
-    { "date": "2025-02-17", "shift": "Afternoon" },
-    { "date": "2025-02-18", "shift": "Night" },
-    { "date": "2025-02-19", "shift": "Afternoon" }
+    { "date": "2025-02-19", "shift": "Afternoon" },
+    { "date": "2025-02-20", "shift": "Afternoon" },
+    { "date": "2025-02-21", "shift": "Afternoon" },
+    { "date": "2025-02-22", "shift": "Rest day" },
+    { "date": "2025-02-23", "shift": "Morning" },
+    { "date": "2025-02-24", "shift": "Morning" },
+    { "date": "2025-02-25", "shift": "Rest day" },
+    { "date": "2025-02-26", "shift": "Morning" },
+    { "date": "2025-02-27", "shift": "Morning" },
+    { "date": "2025-02-28", "shift": "Morning" }
   ]
 }
