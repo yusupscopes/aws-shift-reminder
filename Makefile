@@ -4,7 +4,7 @@ REGION = ap-southeast-1
 VENV_NAME = venv
 PROCESS_JSON_DIR = lambdas/process_json
 REMINDER_DIR = lambdas/reminder
-TERRAFORM_STATE_BUCKET = terraform-state-bucket
+TERRAFORM_STATE_BUCKET = terraform-state-bucket-shift-reminder
 TERRAFORM_STATE_LOCK_TABLE = terraform-state-lock
 
 # Colors for better visibility
