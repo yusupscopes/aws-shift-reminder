@@ -4,6 +4,8 @@ REGION = ap-southeast-1
 VENV_NAME = venv
 PROCESS_JSON_DIR = lambdas/process_json
 REMINDER_DIR = lambdas/reminder
+TERRAFORM_STATE_BUCKET = terraform-state-bucket
+TERRAFORM_STATE_LOCK_TABLE = terraform-state-lock
 
 # Colors for better visibility
 YELLOW := \033[1;33m
@@ -17,6 +19,7 @@ all: init package-all deploy
 
 help:
 	@echo "$(YELLOW)Available commands:$(NC)"
+	@echo "  make init-remote-state - Set up S3 bucket and DynamoDB table for Terraform remote state"
 	@echo "  make init          - Initialize virtual environment and install dependencies"
 	@echo "  make clean         - Remove all build files and virtual environments"
 	@echo "  make package-all   - Package both Lambda functions with dependencies"
@@ -29,6 +32,27 @@ help:
 	@echo "  make lint          - Run pylint on Python code"
 
 # Initialize development environment
+init-remote-state:
+	@echo "$(YELLOW)Setting up remote state infrastructure...$(NC)"
+	aws s3api create-bucket \
+		--bucket $(TERRAFORM_STATE_BUCKET) \
+		--region $(REGION) \
+		--create-bucket-configuration LocationConstraint=$(REGION)
+	aws s3api put-bucket-versioning \
+		--bucket $(TERRAFORM_STATE_BUCKET) \
+		--versioning-configuration Status=Enabled
+	aws s3api put-bucket-encryption \
+		--bucket $(TERRAFORM_STATE_BUCKET) \
+		--server-side-encryption-configuration \
+		'{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
+	aws dynamodb create-table \
+		--table-name $(TERRAFORM_STATE_LOCK_TABLE) \
+		--attribute-definitions AttributeName=LockID,AttributeType=S \
+		--key-schema AttributeName=LockID,KeyType=HASH \
+		--provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
+		--region $(REGION)
+	@echo "$(GREEN)Remote state infrastructure setup complete!$(NC)"
+
 init:
 	@echo "$(YELLOW)Initializing development environment...$(NC)"
 	@if [ ! -d "$(VENV_NAME)" ]; then \
