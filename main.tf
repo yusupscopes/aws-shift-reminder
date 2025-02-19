@@ -209,7 +209,7 @@ resource "aws_cloudwatch_log_group" "reminder_logs" {
 resource "aws_cloudwatch_event_rule" "reminder_schedule" {
   name                = "reminder-schedule"
   description         = "Schedule for sending shift reminders"
-  schedule_expression = "cron(0 13 * * ? *)"  # 1 PM UTC every day
+  schedule_expression = "cron(0 22 * * ? *)"  # 5 AM GMT+7 (22:00 UTC previous day)
 }
 
 # EventBridge Target
