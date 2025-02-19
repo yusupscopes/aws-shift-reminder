@@ -1,0 +1,2 @@
+aws_region         = "your-region"
+notification_email = "your-email@example.com" 

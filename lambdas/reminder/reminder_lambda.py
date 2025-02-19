@@ -3,17 +3,15 @@ from datetime import datetime, timedelta
 import json
 import boto3
 import logging
+import os
 
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb")
-ses_client = boto3.client("ses", region_name="ap-southeast-1")  # Adjust AWS region
-table = dynamodb.Table("ShiftSchedules")
-
-SENDER_EMAIL = "dalkkumiapps@gmail.com"
-RECIPIENT_EMAIL = "yusupmaulana950@gmail.com"
+sns_client = boto3.client("sns", region_name=os.environ["AWS_REGION"])
+table = dynamodb.Table(os.environ["DYNAMODB_TABLE_NAME"])
 
 def lambda_handler(event, context):
     """Check tomorrow's shift and send a reminder"""
@@ -26,18 +24,15 @@ def lambda_handler(event, context):
 
     if shift_info:
         shift = shift_info["shift"]
-        email_subject = f"Reminder: Your Shift for {tomorrow}"
-        email_body = f"Your shift for {tomorrow} is: {shift}."
+        message_subject = f"Reminder: Your Shift for {tomorrow}"
+        message_body = f"Your shift for {tomorrow} is: {shift}."
 
-        logger.info(f"Sending reminder email for {tomorrow}: {shift}")
+        logger.info(f"Sending reminder notification for {tomorrow}: {shift}")
 
-        ses_client.send_email(
-            Source=SENDER_EMAIL,
-            Destination={"ToAddresses": [RECIPIENT_EMAIL]},
-            Message={
-                "Subject": {"Data": email_subject},
-                "Body": {"Text": {"Data": email_body}},
-            },
+        sns_client.publish(
+            TopicArn=os.environ["SNS_TOPIC_ARN"],
+            Message=message_body,
+            Subject=message_subject
         )
     
     return {"statusCode": 200, "body": json.dumps({"message": "Reminder sent!"})}

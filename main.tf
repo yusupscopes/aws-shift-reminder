@@ -123,7 +123,13 @@ resource "aws_lambda_function" "process_json" {
   handler         = "process_json_lambda.lambda_handler"
   runtime         = "python3.13"
 
-   # This will force an update when the zip contents change
+  environment {
+    variables = {
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.shift_schedules.name
+    }
+  }
+
+  # This will force an update when the zip contents change
   source_code_hash = filebase64sha256("process_json_lambda.zip")
 
   depends_on = [
@@ -133,6 +139,37 @@ resource "aws_lambda_function" "process_json" {
   ]
 }
 
+# SNS Topic
+resource "aws_sns_topic" "shift_reminder" {
+  name = "shift-reminder-topic"
+}
+
+# SNS Topic Subscription
+resource "aws_sns_topic_subscription" "shift_reminder_email" {
+  topic_arn = aws_sns_topic.shift_reminder.arn
+  protocol  = "email"
+  endpoint  = var.notification_email
+}
+
+# Add SNS permissions to Lambda role
+resource "aws_iam_role_policy" "lambda_sns" {
+  name = "lambda_sns_policy"
+  role = aws_iam_role.lambda_exec.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = aws_sns_topic.shift_reminder.arn
+      }
+    ]
+  })
+}
+
 # Reminder Lambda Function
 resource "aws_lambda_function" "reminder" {
   filename         = "reminder_lambda.zip"
@@ -140,13 +177,20 @@ resource "aws_lambda_function" "reminder" {
   role            = aws_iam_role.lambda_exec.arn
   handler         = "reminder_lambda.lambda_handler"
   runtime         = "python3.13"
+  
+  environment {
+    variables = {
+      SNS_TOPIC_ARN       = aws_sns_topic.shift_reminder.arn
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.shift_schedules.name
+    }
+  }
 
-   # This will force an update when the zip contents change
   source_code_hash = filebase64sha256("reminder_lambda.zip")
 
   depends_on = [
     aws_iam_role_policy.lambda_logs,
-    aws_iam_role_policy.lambda_dynamodb
+    aws_iam_role_policy.lambda_dynamodb,
+    aws_iam_role_policy.lambda_sns
   ]
 }
 
@@ -204,5 +248,17 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "ap-southeast-1"  # Change this to your desired region
+  region = var.aws_region
+}
+
+# Add variables
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "ap-southeast-1"
+}
+
+variable "notification_email" {
+  description = "Email address for shift notifications"
+  type        = string
 }

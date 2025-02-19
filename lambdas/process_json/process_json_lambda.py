@@ -2,13 +2,14 @@
 import json
 import boto3
 import logging
+import os
 
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table("ShiftSchedules")
+table = dynamodb.Table(os.environ["DYNAMODB_TABLE_NAME"])
 s3_client = boto3.client("s3")
 
 def lambda_handler(event, context):
