@@ -3,6 +3,7 @@
 An automated system for managing and sending shift schedule reminders using AWS services.
 
 ## Architecture
+![Image](https://github.com/user-attachments/assets/2cef9ed6-345b-41f8-8b00-3e3fadc0d8bd)
 - S3 bucket for storing shift schedules
 - Lambda functions for processing schedules and sending reminders
 - DynamoDB for storing shift data
