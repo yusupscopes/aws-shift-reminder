@@ -3,15 +3,19 @@ import os
 from pathlib import Path
 
 # Get configuration from environment variables
-BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
+BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'shift-schedule-reminder')
 AWS_REGION = os.environ.get('AWS_REGION', 'ap-southeast-1')
+AWS_PROFILE = os.environ.get('AWS_PROFILE', 'ym3594216')
 
 def upload_shifts():
     if not BUCKET_NAME:
         raise ValueError("S3_BUCKET_NAME environment variable is not set")
+    
+    # Create a session with the specified profile
+    session = boto3.Session(profile_name=AWS_PROFILE)
 
     # Initialize S3 client
-    s3_client = boto3.client('s3', region_name=AWS_REGION)
+    s3_client = session.client('s3', region_name=AWS_REGION)
     
     # Get the path to shifts.json
     current_dir = Path(__file__).parent
